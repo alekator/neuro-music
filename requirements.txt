@@ -1,0 +1,8 @@
+Django
+django-channels
+numpy
+scipy
+torch
+music21
+plotly
+python-dotenv
