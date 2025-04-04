@@ -70,6 +70,10 @@ TEMPLATES = [
     },
 ]
 
+STATICFILES_DIRS = [
+    BASE_DIR / "simulator/static",
+]
+
 WSGI_APPLICATION = 'django_app.config.wsgi.application'
 
 
