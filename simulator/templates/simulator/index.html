@@ -5,13 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroMusic Lab</title>
+    
+    <!-- Стили -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #2A2F4F;
             --secondary: #917FB3;
             --accent: #E5BEEC;
             --text: #FDE2F3;
+            --transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         * {
@@ -34,19 +38,23 @@
             background: rgba(0,0,0,0.2);
             padding: 20px;
             border-right: 1px solid var(--secondary);
+            position: fixed;
+            height: 100vh;
         }
 
         .logo {
             width: 180px;
             margin-bottom: 40px;
             filter: drop-shadow(0 0 8px var(--accent));
+            transition: var(--transition);
         }
 
         /* Основная область */
         .main-content {
             flex: 1;
             padding: 30px;
-            position: relative;
+            margin-left: 280px;
+            max-width: calc(100% - 280px);
         }
 
         /* Кнопки */
@@ -59,7 +67,7 @@
             color: var(--text);
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .nav-btn:hover {
@@ -67,219 +75,218 @@
             transform: translateX(10px);
         }
 
-        /* Анимация панели */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
         }
 
-        .visualization-panel {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
+        .modal-content {
+            background: var(--primary);
+            margin: 5% auto;
             padding: 25px;
-            min-height: 400px;
-            animation: slideIn 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            width: 60%;
+            border-radius: 15px;
+            animation: modalSlide 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* Эффект неона для лого */
-        .logo:hover {
-            filter: drop-shadow(0 0 12px var(--accent));
-            transition: filter 0.4s;
-        }    
+        /* Анимации */
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Элементы интерфейса */
+        #loading {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            padding: 15px 25px;
+            border-radius: 8px;
+            border: 1px solid var(--secondary);
+            display: none;
+            animation: pulse 1.5s infinite;
+        }
+
+        #result {
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid var(--secondary);
+        }
+
+        .audio-player {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20px auto;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Сайдбар -->
-    <div class="sidebar">
+    <aside class="sidebar">
         <img src="{% static 'images/logo.png' %}" class="logo" alt="NeuroMusic">
-        
-        <button class="nav-btn">🧠 Режимы симуляции</button>
-        <button class="nav-btn">🎵 Генератор музыки</button>
-        <button class="nav-btn">📊 Аналитика</button>
-        <button class="nav-btn">⚙️ Настройки</button>
-    </div>
+        <nav>
+            <button class="nav-btn">🧠 Режимы</button>
+            <button class="nav-btn">🎵 Генератор</button>
+            <button class="nav-btn">📊 Аналитика</button>
+            <button class="nav-btn">⚙️ Настройки</button>
+        </nav>
+    </aside>
 
     <!-- Основной контент -->
-    <div class="main-content">
+    <main class="main-content">
         <div class="visualization-panel">
-            <!-- Здесь будет график/визуализация -->
-        </div>
-    </div>
-
-    <!-- Emotion Modal -->
-<div id="emotion-modal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>🎵 Давайте настроим вашу музыку!</h2>
-        
-        <!-- Шкала самооценки -->
-        <div class="question-block">
-            <p>1. Оцените свое текущее состояние:</p>
-            <div class="likert-scale">
-                <label><input type="radio" name="stress" value="1">😊 Спокоен</label>
-                <label><input type="radio" name="stress" value="2">😐 Нейтрален</label>
-                <label><input type="radio" name="stress" value="3">😟 Напряжен</label>
+            <div id="result"></div>
+            <div class="audio-player">
+                <audio controls id="audio-element"></audio>
             </div>
         </div>
+    </main>
 
-        <!-- Выбор эмоций через изображения -->
-        <div class="question-block">
-            <p>2. Выберите изображение, соответствующее вашему настроению:</p>
-            <div class="image-grid">
-                <img src="{% static 'emotions/calm.jpg' %}" data-emotion="relax">
-                <img src="{% static 'emotions/happy.jpg' %}" data-emotion="happy">
-                <img src="{% static 'emotions/sad.jpg' %}" data-emotion="sad">
-            </div>
-        </div>
-
-        <button id="submit-emotion" class="neuro-btn">Сгенерировать музыку!</button>
-    </div>
-</div>
-
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-    }
-
-    .modal-content {
-        background: #2A2F4F;
-        margin: 5% auto;
-        padding: 25px;
-        width: 60%;
-        border-radius: 15px;
-        animation: modalSlide 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    .image-grid img {
-        width: 150px;
-        margin: 10px;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: all 0.3s;
-    }
-
-    .image-grid img.selected {
-        border-color: #E5BEEC;
-        transform: scale(1.1);
-    }
-
-    @keyframes modalSlide {
-        from { transform: translateY(-50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    #loading {
-    background: var(--primary);
-    border: 2px solid var(--secondary);
-    color: var(--text);
-    box-shadow: 0 4px 15px rgba(229, 190, 236, 0.3);
-    }
-
-    #result {
-    background: rgba(255,255,255,0.05);
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-    border: 1px solid var(--secondary);
-    }
-    
-</style>
-
-<script>
-    // Показываем модальное окно при загрузке
-    document.getElementById('emotion-modal').style.display = 'block';
-
-    // Инициализация обработчиков изображений
-    document.querySelectorAll('.image-grid img').forEach(img => {
-        img.addEventListener('click', () => {
-            document.querySelectorAll('.image-grid img').forEach(i => i.classList.remove('selected'));
-            img.classList.add('selected');
-        });
-    });
-
-    // Обработчик отправки формы
-    document.getElementById('submit-emotion').addEventListener('click', () => {
-        const stressLevel = document.querySelector('input[name="stress"]:checked')?.value;
-        const selectedEmotion = document.querySelector('.image-grid img.selected')?.dataset.emotion;
-
-        // Валидация полей
-        if (!stressLevel || !selectedEmotion) {
-            alert("Пожалуйста, заполните все поля!");
-            return;
-        }
-
-        // Показать индикатор загрузки
-        document.getElementById('loading').style.display = 'block';
-
-        // Отправка данных эмоций
-        fetch('/api/set-emotion-profile/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                stress: stressLevel,
-                emotion: selectedEmotion
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Обновление интерфейса
-            document.getElementById('emotion-modal').style.display = 'none';
-            document.getElementById('loading').style.display = 'none';
+    <!-- Модальное окно эмоций -->
+    <div id="emotion-modal" class="modal">
+        <div class="modal-content">
+            <h2>🎵 Настройка генерации</h2>
             
-            // Показать параметры генерации
-            document.getElementById('result').innerHTML = `
-                <h3>🎵 Параметры генерации:</h3>
-                <p>Темп: ${data.tempo} BPM</p>
-                <p>Лад: ${data.scale}</p>
-                <div id="music-generation-status">⌛ Начинаем генерацию...</div>
-            `;
-            document.getElementById('result').style.display = 'block';
+            <div class="question-block">
+                <h3>1. Ваше текущее состояние:</h3>
+                <div class="likert-scale">
+                    <label>
+                        <input type="radio" name="stress" value="1">
+                        <span>😊 Спокойствие</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="stress" value="2">
+                        <span>😐 Нейтральное</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="stress" value="3">
+                        <span>😟 Напряжение</span>
+                    </label>
+                </div>
+            </div>
 
-            // Запуск генерации музыки
-            return fetch('/api/generate-music/');
-        })
-        .then(response => response.json())
-        .then(musicData => {
-            // Обновление статуса генерации
-            document.getElementById('music-generation-status').innerHTML = `
-                🎉 Музыка сгенерирована!
-                <audio controls style="margin-top:10px;">
-                    <source src="${musicData.url}" type="audio/midi">
-                    Ваш браузер не поддерживает аудио элемент
-                </audio>
-            `;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('loading').style.display = 'none';
-            alert('Произошла ошибка при обработке запроса');
-        })
-        .finally(() => {
-            // Сброс состояния формы
-            document.querySelectorAll('input[type="radio"]').forEach(input => input.checked = false);
-            document.querySelectorAll('.image-grid img').forEach(img => img.classList.remove('selected'));
+            <div class="question-block">
+                <h3>2. Выберите настроение:</h3>
+                <div class="image-grid">
+                    <img src="{% static 'emotions/calm.jpg' %}" 
+                         data-emotion="relax" 
+                         alt="Спокойствие">
+                    <img src="{% static 'emotions/happy.jpg' %}" 
+                         data-emotion="happy" 
+                         alt="Радость">
+                    <img src="{% static 'emotions/sad.jpg' %}" 
+                         data-emotion="sad" 
+                         alt="Грусть">
+                </div>
+            </div>
+
+            <button id="submit-emotion" class="nav-btn">
+                🎶 Начать генерацию
+            </button>
+        </div>
+    </div>
+
+    <!-- Индикатор загрузки -->
+    <div id="loading">
+        ⏳ Генерация музыки...
+    </div>
+
+    <script>
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            // Показать модалку
+            const modal = document.getElementById('emotion-modal');
+            modal.style.display = 'block';
+
+            // Обработчик выбора изображений
+            document.querySelectorAll('.image-grid img').forEach(img => {
+                img.addEventListener('click', () => {
+                    document.querySelectorAll('.image-grid img')
+                        .forEach(i => i.classList.remove('selected'));
+                    img.classList.add('selected');
+                });
+            });
+
+            document.getElementById('submit-emotion').addEventListener('click', async () => {
+                const stress = document.querySelector('input[name="stress"]:checked')?.value;
+                const emotion = document.querySelector('.image-grid img.selected')?.dataset.emotion;
+
+                if (!stress || !emotion) {
+                    alert('Пожалуйста, заполните все поля!');
+                    return;
+                }
+
+                try {
+                    document.getElementById('loading').style.display = 'block';
+                    modal.style.display = 'none'; // Сразу скрываем модалку
+                    
+                    // 🔥 Новый код - сразу генерация музыки!
+                    const response = await fetch(`/api/generate-music/?emotion=${emotion}&stress=${stress}`);
+                    
+                    if (!response.ok) throw new Error('Ошибка генерации');
+                    
+                    const data = await response.json();
+                    
+                    // Обновляем интерфейс
+                    document.getElementById('result').innerHTML = `
+                        <h3>🎵 Параметры:</h3>
+                        <p>Эмоция: ${emotion}</p>
+                        <p>Темп: ${data.tempo} BPM</p>
+                        <p>Лад: ${data.scale}</p>
+                        <button onclick="document.getElementById('audio-element').play()">
+                            ▶️ Воспроизвести
+                        </button>
+                    `;
+                    
+                    // Устанавливаем аудио
+                    const audioElement = document.getElementById('audio-element');
+                    audioElement.src = data.url;
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка генерации: ' + error.message);
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
+                }
+            });
         });
-    });
-</script>
-
-<!-- Внутри тега body, после модального окна -->
-<div id="loading" style="display: none; position: fixed; top: 20px; right: 20px; background: #2A2F4F; padding: 15px; border-radius: 8px;">
-    ⏳ Генерация музыки...
-</div>
-
-<div id="result" style="display: none;"></div>
-
-<button onclick="document.getElementById('emotion-modal').style.display='block'">
-    Показать опросник
-</button>
-
+    </script>
 </body>
 </html>
