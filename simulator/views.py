@@ -1,5 +1,5 @@
 from .eeg_simulator import EEGGenerator
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -12,7 +12,7 @@ from django.conf import settings
 from datetime import datetime
 import logging
 import numpy as np
-from django.http import FileResponse
+from midi2audio import FluidSynth
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,16 @@ def health_check(request):
 
 def home(request):
     return render(request, 'simulator/index.html')
+
+def partial_view(request, page_name):
+    """Обработчик для загрузки частичных представлений"""
+    templates = {
+        'info': 'simulator/partials/info.html',
+        'generator': 'simulator/partials/generator.html',
+        'analytics': 'simulator/partials/analytics.html',
+        'settings': 'simulator/partials/settings.html',
+    }
+    return render(request, templates.get(page_name, 'simulator/partials/info.html'))
 
 def simulate_eeg(request):
     try:
@@ -42,7 +52,6 @@ def set_emotion_profile(request):
         try:
             data = json.loads(request.body)
             
-            # Валидация входных данных
             if 'stress' not in data or 'emotion' not in data:
                 return JsonResponse({'error': 'Missing required fields'}, status=400)
             
@@ -50,11 +59,9 @@ def set_emotion_profile(request):
                 request.session.create()
                 request.session.save()
 
-            # Нормализация данных
-            stress = max(1, min(5, int(data['stress'])))  # Ограничение 1-5
+            stress = max(1, min(5, int(data['stress'])))
             emotion = data['emotion'] if data['emotion'] in ['relax', 'happy', 'sad'] else 'relax'
 
-            # Создание/обновление профиля
             profile, created = EmotionProfile.objects.update_or_create(
                 session_key=request.session.session_key,
                 defaults={
@@ -80,66 +87,67 @@ def set_emotion_profile(request):
 
 def generate_music(request):
     try:
-        # Проверка доступности медиа-папки
-        if not os.path.exists(settings.MEDIA_ROOT):
-            os.makedirs(settings.MEDIA_ROOT)
-            print(f"Created media dir: {settings.MEDIA_ROOT}")
+        logger.info("Starting music generation")
         
+        # Проверка soundfont
+        soundfont_path = os.path.join(settings.MEDIA_ROOT, 'soundfonts/GeneralUser.sf2')
+        logger.info(f"Soundfont path: {soundfont_path}")
+        
+        if not os.path.exists(soundfont_path):
+            logger.error("Soundfont file not found")
+            raise Exception(f"Soundfont file not found at {soundfont_path}")
+
+        # Проверка медиа-папки
+        os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
         if not os.access(settings.MEDIA_ROOT, os.W_OK):
             raise Exception(f"Media directory is not writable: {settings.MEDIA_ROOT}")
         
-        # 1. Получаем параметры из запроса
+        # Получение параметров
         emotion = request.GET.get('emotion', 'relax')
         stress = int(request.GET.get('stress', 3))
         
-        # 2. Генерируем EEG данные
+        # Генерация EEG
         eeg_generator = EEGGenerator()
         eeg_raw = eeg_generator.get_signal(emotion)
         
-        # 3. Подготавливаем данные для генератора
-        eeg_data = {
+        # Создание генератора музыки
+        generator = AmbientGenerator(eeg_data={
             'emotion': emotion,
             'stress_level': stress,
             'dominant_freq': float(eeg_raw['dominant_freq']) if isinstance(eeg_raw, dict) else 10.0,
             'wave_type': eeg_raw['wave_type'] if isinstance(eeg_raw, dict) else 'sin',
             'amplitude': float(eeg_raw['amplitude']) if isinstance(eeg_raw, dict) else 1.0
-        }
-
-        # 4. Создаем и настраиваем генератор
-        generator = AmbientGenerator(eeg_data=eeg_data)
+        })
+        
+        # Генерация композиции
         composition = generator.generate(duration=32)
         
-        # 5. Сохраняем результат
+        # Сохранение файлов
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"neuro_{emotion}_{stress}_{timestamp}.mid"
-        filepath = os.path.join(settings.MEDIA_ROOT, filename)
+        filename = f"neuro_{emotion}_{stress}_{timestamp}"
         
-        # Создаем папку media если не существует
-        os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+        midi_path = os.path.join(settings.MEDIA_ROOT, f"{filename}.mid")
+        composition.write('midi', fp=midi_path)
         
-        # Сохраняем MIDI файл
-        composition.write('midi', fp=filepath)
+        # Конвертация в MP3
+        mp3_path = os.path.join(settings.MEDIA_ROOT, f"{filename}.mp3")
+        fs = FluidSynth(sound_font=soundfont_path)
+        fs.midi_to_audio(midi_path, mp3_path)
         
-        # Проверяем что файл создан
-        if not os.path.exists(filepath):
-            raise Exception("MIDI file was not created successfully")
+        # Проверка файлов
+        if not all(os.path.exists(p) for p in [midi_path, mp3_path]):
+            raise Exception("Failed to create audio files")
         
-        # После сохранения файла, перед возвратом ответа:
-        print(f"File exists: {os.path.exists(filepath)}")  # Должно быть True
-        print(f"Full path: {filepath}")
-        print(f"Media root: {settings.MEDIA_ROOT}")
-        # 6. Возвращаем результат
         return JsonResponse({
             'status': 'success',
-            'url': f'/media/{filename}', 
-            'filepath': filepath,  # Для отладки
+            'midi_url': f'/media/{filename}.mid',
+            'mp3_url': f'/media/{filename}.mp3',
             'metadata': {
                 'tempo': generator.tempo,
-                'scale': generator.scale_name,
-                'instruments': [str(i) for i in generator.instruments],
+                'duration': 32,
                 'emotion': emotion,
                 'stress': stress,
-                'duration': 32
+                'file_size': os.path.getsize(mp3_path)
             }
         })
         
@@ -147,26 +155,32 @@ def generate_music(request):
         logger.error(f"Music generation failed: {str(e)}", exc_info=True)
         return JsonResponse({
             'status': 'error',
-            'error': 'Music generation failed',
-            'details': str(e),
+            'error': str(e),
             'debug': {
-                'emotion': emotion if 'emotion' in locals() else None,
-                'stress': stress if 'stress' in locals() else None,
-                'eeg_raw': str(eeg_raw) if 'eeg_raw' in locals() else None
+                'media_root': settings.MEDIA_ROOT,
+                'cwd': os.getcwd(),
+                'soundfont_exists': os.path.exists(soundfont_path) if 'soundfont_path' in locals() else False
             }
         }, status=500)
-    
 
 def test_write(request):
+    """Тест записи в медиа-папку"""
     test_file = os.path.join(settings.MEDIA_ROOT, 'test.txt')
-    with open(test_file, 'w') as f:
-        f.write('test')
-    return JsonResponse({
-        'success': os.path.exists(test_file),
-        'path': test_file,
-        'cwd': os.getcwd()
-    })
+    try:
+        with open(test_file, 'w') as f:
+            f.write('test')
+        return JsonResponse({
+            'success': os.path.exists(test_file),
+            'path': test_file,
+            'media_root': settings.MEDIA_ROOT
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 def test_media(request):
-    filepath = os.path.join(settings.MEDIA_ROOT, 'neuro_happy_1_20250405_184215.mid')
-    return FileResponse(open(filepath, 'rb'))
+    """Тест доступа к медиафайлам"""
+    test_file = os.path.join(settings.MEDIA_ROOT, 'test.txt')
+    try:
+        return FileResponse(open(test_file, 'rb'))
+    except FileNotFoundError:
+        return HttpResponse("Test file not found", status=404)

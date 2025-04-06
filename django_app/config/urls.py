@@ -28,5 +28,7 @@ urlpatterns = [
     path('health/', health_check),
     path('', include('simulator.urls')),
     path('test-media/', views.test_media),
+    path('partials/<str:page_name>/', views.partial_view, name='partial'),
+     path('api/generate-music/', views.generate_music, name='generate_music'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

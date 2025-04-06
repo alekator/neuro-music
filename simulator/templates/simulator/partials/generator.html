@@ -1,0 +1,123 @@
+{% load static %}
+<div class="player-container">
+    <h3>Генератор нейромузыки</h3>
+    <div id="result"></div>
+    <audio id="audio-player" controls style="width: 100%">
+        Ваш браузер не поддерживает аудиоэлемент.
+    </audio>
+    <div class="player-controls">
+        <span id="track-info"></span>
+    </div>
+</div>
+
+<!-- Модальное окно эмоций -->
+<div id="emotion-modal" class="modal">
+    <div class="modal-content">
+        <h2>🎵 Настройка генерации</h2>
+        
+        <div class="question-block">
+            <h3>1. Ваше текущее состояние:</h3>
+            <div class="likert-scale">
+                <label>
+                    <input type="radio" name="stress" value="1">
+                    <span>😊 Спокойствие</span>
+                </label>
+                <label>
+                    <input type="radio" name="stress" value="2">
+                    <span>😐 Нейтральное</span>
+                </label>
+                <label>
+                    <input type="radio" name="stress" value="3">
+                    <span>😟 Напряжение</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <h3>2. Выберите настроение:</h3>
+            <div class="image-grid">
+                <img src="{% static 'emotions/calm.jpg' %}" 
+                     data-emotion="relax" 
+                     alt="Спокойствие">
+                <img src="{% static 'emotions/happy.jpg' %}" 
+                     data-emotion="happy" 
+                     alt="Радость">
+                <img src="{% static 'emotions/sad.jpg' %}" 
+                     data-emotion="sad" 
+                     alt="Грусть">
+            </div>
+        </div>
+
+        <button id="submit-emotion" class="nav-btn">
+            🎶 Начать генерацию
+        </button>
+    </div>
+</div>
+
+<!-- Индикатор загрузки -->
+<div id="loading">
+    ⏳ Генерация музыки...
+</div>
+
+<script>
+    // Инициализация генератора при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+        const audioPlayer = document.getElementById('audio-player');
+        const modal = document.getElementById('emotion-modal');
+        const trackInfo = document.getElementById('track-info');
+        
+        // Показать модалку при загрузке генератора
+        modal.style.display = 'block';
+
+        // Обработчик выбора изображений
+        document.querySelectorAll('.image-grid img').forEach(img => {
+            img.addEventListener('click', () => {
+                document.querySelectorAll('.image-grid img')
+                    .forEach(i => i.classList.remove('selected'));
+                img.classList.add('selected');
+            });
+        });
+
+        // Обработчик отправки формы
+        document.getElementById('submit-emotion').addEventListener('click', async () => {
+            const stress = document.querySelector('input[name="stress"]:checked')?.value;
+            const emotion = document.querySelector('.image-grid img.selected')?.dataset.emotion;
+
+            if (!stress || !emotion) {
+                alert('Пожалуйста, выберите состояние и настроение!');
+                return;
+            }
+
+            try {
+                document.getElementById('loading').style.display = 'block';
+                modal.style.display = 'none';
+                
+                const response = await fetch(`/api/generate-music/?emotion=${emotion}&stress=${stress}`);
+                
+                if (!response.ok) throw new Error('Ошибка генерации');
+                
+                const data = await response.json();
+                
+                trackInfo.textContent = `🎵 ${emotion.charAt(0).toUpperCase() + emotion.slice(1)} | ${data.metadata.tempo}BPM`;
+                
+                audioPlayer.src = data.mp3_url;
+                audioPlayer.oncanplay = () => {
+                    audioPlayer.play().catch(e => {
+                        console.log("Автовоспроизведение заблокировано. Нажмите play на плеере.");
+                    });
+                };
+                
+                audioPlayer.onerror = () => {
+                    trackInfo.textContent = '❌ Ошибка загрузки аудио';
+                    console.error("Audio error:", audioPlayer.error);
+                };
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                trackInfo.textContent = '❌ Ошибка: ' + error.message;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+    });
+</script>

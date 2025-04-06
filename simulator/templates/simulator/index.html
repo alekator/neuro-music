@@ -5,10 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroMusic Lab</title>
-    
-    <!-- Стили -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --primary: #2A2F4F;
@@ -17,22 +14,22 @@
             --text: #FDE2F3;
             --transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
-
+    
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Roboto', sans-serif;
         }
-
+    
         body {
             background: var(--primary);
             color: var(--text);
             min-height: 100vh;
             display: flex;
         }
-
-        /* Сайдбар */
+    
+        /* Стили для сайдбара */
         .sidebar {
             width: 280px;
             background: rgba(0,0,0,0.2);
@@ -40,42 +37,103 @@
             border-right: 1px solid var(--secondary);
             position: fixed;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-
+    
+        /* Стили для логотипа */
+        .logo-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(42, 47, 79, 0.3);
+            transition: all 0.4s ease;
+        }
+    
         .logo {
-            width: 180px;
-            margin-bottom: 40px;
-            filter: drop-shadow(0 0 8px var(--accent));
-            transition: var(--transition);
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            border-radius: 8px;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 0 5px rgba(42, 47, 79, 0.5));
         }
-
-        /* Основная область */
+    
+        .logo-container:hover {
+            background: rgba(145, 127, 179, 0.2);
+        }
+    
+        .logo-container:hover .logo {
+            animation: logo-glow 2s infinite alternate;
+            transform: scale(1.05);
+        }
+    
+        @keyframes logo-glow {
+            0% {
+                box-shadow: 0 0 5px 0px var(--accent),
+                            0 0 10px 0px rgba(229, 190, 236, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 15px 5px var(--accent),
+                            0 0 25px 10px rgba(229, 190, 236, 0.5);
+            }
+        }
+    
+        /* Стили для навигации */
+        nav {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .nav-btn {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 6px 0;
+            background: rgba(42, 47, 79, 0.3);
+            border: 1px solid var(--secondary);
+            color: var(--text);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+    
+        .nav-btn:hover {
+            background: linear-gradient(90deg, 
+                        rgba(145,127,179,0.3) 0%, 
+                        rgba(42,47,79,0.5) 50%, 
+                        rgba(145,127,179,0.3) 100%);
+            transform: translateX(10px);
+            box-shadow: 0 0 15px rgba(229, 190, 236, 0.3);
+        }
+    
+        .nav-btn.active {
+            background: linear-gradient(90deg, 
+                        var(--secondary) 0%, 
+                        var(--primary) 50%, 
+                        var(--secondary) 100%);
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(229, 190, 236, 0.5);
+        }
+    
+        /* Остальные стили */
         .main-content {
             flex: 1;
             padding: 30px;
             margin-left: 280px;
             max-width: calc(100% - 280px);
         }
-
-        /* Кнопки */
-        .nav-btn {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: none;
-            border: 1px solid var(--secondary);
-            color: var(--text);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-btn:hover {
-            background: var(--secondary);
-            transform: translateX(10px);
-        }
-
-        /* Модальное окно */
+    
         .modal {
             display: none;
             position: fixed;
@@ -87,7 +145,7 @@
             background: rgba(0,0,0,0.7);
             backdrop-filter: blur(5px);
         }
-
+    
         .modal-content {
             background: var(--primary);
             margin: 5% auto;
@@ -96,20 +154,7 @@
             border-radius: 15px;
             animation: modalSlide 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
-
-        /* Анимации */
-        @keyframes modalSlide {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        /* Элементы интерфейса */
+    
         #loading {
             position: fixed;
             top: 20px;
@@ -121,7 +166,7 @@
             display: none;
             animation: pulse 1.5s infinite;
         }
-
+    
         #result {
             background: rgba(255,255,255,0.05);
             padding: 25px;
@@ -129,19 +174,80 @@
             margin-top: 20px;
             border: 1px solid var(--secondary);
         }
-
+    
         .audio-player {
             margin-top: 20px;
             width: 100%;
         }
-
+    
+        .player-container {
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    
+        .btn {
+            background: #2A2F4F;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        #track-info {
+            color: #E5BEEC;
+            margin-left: 15px;
+        }
+    
+        .image-grid img {
+            cursor: pointer;
+            margin: 0 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+    
+        .image-grid img.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+    
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    
         /* Адаптивность */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
+                padding: 15px;
                 margin-left: 0;
+            }
+            
+            .logo-container {
+                padding: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .logo {
+                max-width: 140px;
+            }
+            
+            .nav-btn {
+                padding: 12px;
+                font-size: 14px;
             }
             
             .main-content {
@@ -160,131 +266,45 @@
 <body>
     <!-- Сайдбар -->
     <aside class="sidebar">
-        <img src="{% static 'images/logo.png' %}" class="logo" alt="NeuroMusic">
+        <!-- Логотип с анимацией -->
+        <div class="logo-container">
+            <img src="{% static 'images/logo.png' %}" class="logo" alt="NeuroMusic">
+        </div>
+        
         <nav>
-            <button class="nav-btn">🧠 Режимы</button>
-            <button class="nav-btn">🎵 Генератор</button>
-            <button class="nav-btn">📊 Аналитика</button>
-            <button class="nav-btn">⚙️ Настройки</button>
+            <button class="nav-btn" data-page="info">ℹ️ Информация</button>
+            <button class="nav-btn" data-page="generator">🎵 Генератор</button>
+            <button class="nav-btn" data-page="analytics">📊 Аналитика</button>
+            <button class="nav-btn" data-page="settings">⚙️ Настройки</button>
         </nav>
     </aside>
 
     <!-- Основной контент -->
-    <main class="main-content">
-        <div class="visualization-panel">
-            <div id="result"></div>
-            <div class="audio-player">
-                <audio controls id="audio-element"></audio>
-            </div>
-        </div>
+    <main class="main-content" id="content-container">
+        {% include 'simulator/partials/info.html' %}
     </main>
 
-    <!-- Модальное окно эмоций -->
-    <div id="emotion-modal" class="modal">
-        <div class="modal-content">
-            <h2>🎵 Настройка генерации</h2>
-            
-            <div class="question-block">
-                <h3>1. Ваше текущее состояние:</h3>
-                <div class="likert-scale">
-                    <label>
-                        <input type="radio" name="stress" value="1">
-                        <span>😊 Спокойствие</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="stress" value="2">
-                        <span>😐 Нейтральное</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="stress" value="3">
-                        <span>😟 Напряжение</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="question-block">
-                <h3>2. Выберите настроение:</h3>
-                <div class="image-grid">
-                    <img src="{% static 'emotions/calm.jpg' %}" 
-                         data-emotion="relax" 
-                         alt="Спокойствие">
-                    <img src="{% static 'emotions/happy.jpg' %}" 
-                         data-emotion="happy" 
-                         alt="Радость">
-                    <img src="{% static 'emotions/sad.jpg' %}" 
-                         data-emotion="sad" 
-                         alt="Грусть">
-                </div>
-            </div>
-
-            <button id="submit-emotion" class="nav-btn">
-                🎶 Начать генерацию
-            </button>
-        </div>
-    </div>
-
-    <!-- Индикатор загрузки -->
-    <div id="loading">
-        ⏳ Генерация музыки...
-    </div>
-
     <script>
-        // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', () => {
-            // Показать модалку
-            const modal = document.getElementById('emotion-modal');
-            modal.style.display = 'block';
-
-            // Обработчик выбора изображений
-            document.querySelectorAll('.image-grid img').forEach(img => {
-                img.addEventListener('click', () => {
-                    document.querySelectorAll('.image-grid img')
-                        .forEach(i => i.classList.remove('selected'));
-                    img.classList.add('selected');
+            // Загрузка контента при нажатии на кнопки
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const page = btn.dataset.page;
+                    
+                    // Убираем активный класс у всех кнопок
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    // Добавляем активный класс текущей кнопке
+                    btn.classList.add('active');
+                    
+                    // Загружаем соответствующий HTML-файл
+                    try {
+                        const response = await fetch(`/partials/${page}/`);
+                        const html = await response.text();
+                        document.getElementById('content-container').innerHTML = html;
+                    } catch (error) {
+                        console.error('Ошибка загрузки страницы:', error);
+                    }
                 });
-            });
-
-            document.getElementById('submit-emotion').addEventListener('click', async () => {
-                const stress = document.querySelector('input[name="stress"]:checked')?.value;
-                const emotion = document.querySelector('.image-grid img.selected')?.dataset.emotion;
-
-                if (!stress || !emotion) {
-                    alert('Пожалуйста, заполните все поля!');
-                    return;
-                }
-
-                try {
-                    document.getElementById('loading').style.display = 'block';
-                    modal.style.display = 'none'; // Сразу скрываем модалку
-                    
-                    // 🔥 Новый код - сразу генерация музыки!
-                    const response = await fetch(`/api/generate-music/?emotion=${emotion}&stress=${stress}`);
-                    
-                    if (!response.ok) throw new Error('Ошибка генерации');
-                    
-                    const data = await response.json();
-                    
-                    // Обновляем интерфейс
-                    document.getElementById('result').innerHTML = `
-                        <h3>🎵 Параметры:</h3>
-                        <p>Эмоция: ${emotion}</p>
-                        <p>Темп: ${data.tempo} BPM</p>
-                        <p>Лад: ${data.scale}</p>
-                        <button onclick="document.getElementById('audio-element').play()">
-                            ▶️ Воспроизвести
-                        </button>
-                    `;
-                    
-                    // Устанавливаем аудио
-                    const audioElement = document.getElementById('audio-element');
-                    audioElement.src = data.url;
-                    
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    alert('Ошибка генерации: ' + error.message);
-                } finally {
-                    document.getElementById('loading').style.display = 'none';
-                }
             });
         });
     </script>
