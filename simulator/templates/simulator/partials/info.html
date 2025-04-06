@@ -1,19 +1,587 @@
-<div class="info-content">
-    <h2>ℹ️ Информация о NeuroMusic Lab</h2>
-    <p>Добро пожаловать в приложение для генерации музыки на основе эмоционального состояния.</p>
+<style>
+    #brain-wrapper {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
     
-    <h3>Как использовать:</h3>
-    <ol>
-        <li>Нажмите "Генератор" в меню слева</li>
-        <li>Выберите ваше текущее состояние</li>
-        <li>Выберите желаемое настроение</li>
-        <li>Нажмите "Начать генерацию"</li>
-    </ol>
+    #brain-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Добавляем свечение для волн */
+    #brain-container::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, 
+        rgba(229, 190, 236, 0.1) 0%, 
+        rgba(229, 190, 236, 0.05) 40%, 
+        transparent 70%);
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      pointer-events: none;
+    }
     
-    <h3>Технологии:</h3>
-    <ul>
-        <li>Django - backend</li>
-        <li>music21 - генерация музыки</li>
-        <li>FluidSynth - синтез звука</li>
-    </ul>
+    .model-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+    }
+    
+    .control-btn {
+      background: rgba(30, 30, 30, 0.8);
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+      min-width: 120px;
+    }
+    
+    .control-btn:hover {
+      background: rgba(60, 60, 60, 0.9);
+      border-color: #666;
+      transform: translateY(-2px);
+    }
+    
+    .fullscreen-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(30, 30, 30, 0.8);
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s;
+    }
+    
+    .fullscreen-btn:hover {
+      background: rgba(60, 60, 60, 0.9);
+    }
+    
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      color: white;
+      font-size: 18px;
+    }
+
+    /* Новые стили для текстового блока */
+    .app-description {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(42, 47, 79, 0.3);
+      border-radius: 12px;
+      border: 1px solid var(--secondary);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .app-description h1 {
+      color: var(--accent);
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(229, 190, 236, 0.5);
+    }
+    
+    .app-description h2 {
+      color: var(--accent);
+      font-size: 1.8rem;
+      margin: 30px 0 15px;
+      border-bottom: 1px solid var(--secondary);
+      padding-bottom: 8px;
+    }
+    
+    .app-description p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+    
+    .app-description ul {
+      margin: 20px 0;
+      padding-left: 30px;
+    }
+    
+    .app-description li {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    
+    .highlight {
+      background: rgba(145, 127, 179, 0.2);
+      padding: 2px 5px;
+      border-radius: 3px;
+      color: var(--accent);
+    }
+    
+    /* Адаптивность для текстового блока */
+    @media (max-width: 768px) {
+      .app-description {
+        padding: 20px;
+        margin: 20px;
+      }
+      
+      .app-description h1 {
+        font-size: 2rem;
+      }
+      
+      .app-description h2 {
+        font-size: 1.5rem;
+      }
+    }
+</style>
+
+<div id="brain-wrapper">
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">Загрузка модели мозга...</div>
+  <div id="brain-container"></div>
+  
+  <button class="fullscreen-btn" id="fullscreen-btn">Полный экран</button>
+  
+  <div class="model-controls">
+    <button class="control-btn" id="zoom-in">+ Увеличить</button>
+    <button class="control-btn" id="zoom-out">- Уменьшить</button>
+    <button class="control-btn" id="reset-view">Сбросить вид</button>
+    <button class="control-btn" id="rotate-toggle">Вращение: Вкл</button>
+  </div>
 </div>
+
+<!-- Новый текстовый блок -->
+<div class="app-description">
+    <h1>NeuroMusic Lab: Генерация нейромелодий на основе сигналов мозга</h1>
+    
+    <p>Добро пожаловать в инновационное приложение <span class="highlight">NeuroMusic Lab</span>, которое преобразует электрическую активность вашего мозга в уникальные музыкальные композиции. Наша технология использует последние достижения в области нейронаук и искусственного интеллекта для создания персонализированной музыки, отражающей ваше текущее психическое состояние.</p>
+    
+    <h2>Как это работает?</h2>
+    
+    <p>Приложение анализирует <span class="highlight">EEG-сигналы</span> (электроэнцефалограмму) вашего мозга, выделяя ключевые паттерны активности:</p>
+    
+    <ul>
+      <li><strong>Частотные характеристики:</strong> Альфа, бета, тета и дельта волны определяют ритмическую структуру музыки</li>
+      <li><strong>Амплитуда сигналов:</strong> Влияет на громкость и интенсивность звучания</li>
+      <li><strong>Межполушарная асимметрия:</strong> Определяет баланс между мелодией и гармонией</li>
+      <li><strong>Эмоциональные маркеры:</strong> Специальные алгоритмы распознают эмоциональное состояние</li>
+    </ul>
+    
+    <h2>Научная основа</h2>
+    
+    <p>Наша технология основана на последних исследованиях в области <span class="highlight">нейромузыкологии</span> и использует проверенные научные принципы:</p>
+    
+    <p>Исследования показали, что различные частоты мозговых волн коррелируют с определенными эмоциональными состояниями. Например, повышенная активность альфа-волн (8-12 Гц) ассоциируется с расслабленным состоянием, в то время как бета-волны (12-30 Гц) связаны с активным мышлением и концентрацией.</p>
+    
+    <p>Мы преобразуем эти паттерны в музыкальные параметры:</p>
+    
+    <ul>
+      <li>Частота мозговых волн → Темп и ритм музыки</li>
+      <li>Амплитуда колебаний → Громкость и динамика</li>
+      <li>Соотношение волн → Гармоническая сложность</li>
+      <li>Локализация активности → Выбор инструментов</li>
+    </ul>
+    
+    <h2>Практическое применение</h2>
+    
+    <p>NeuroMusic Lab находит применение в различных областях:</p>
+    
+    <ul>
+      <li><strong>Медитация и релаксация:</strong> Музыка, синхронизированная с вашим мозгом, усиливает эффект расслабления</li>
+      <li><strong>Креативная работа:</strong> Помогает войти в состояние потока</li>
+      <li><strong>Терапевтическое использование:</strong> В нейрореабилитации и терапии психических расстройств</li>
+      <li><strong>Научные исследования:</strong> Изучение связи между мозговой активностью и восприятием музыки</li>
+    </ul>
+    
+    <h2>Технологический стек</h2>
+    
+    <p>Для реализации проекта используются следующие технологии:</p>
+    
+    <ul>
+      <li><strong>Django</strong> - высокоуровневый Python фреймворк для backend</li>
+      <li><strong>Three.js</strong> - визуализация 3D моделей мозга (которую вы видите выше)</li>
+      <li><strong>TensorFlow.js</strong> - анализ и интерпретация EEG сигналов</li>
+      <li><strong>Web Audio API</strong> - генерация и обработка звука в реальном времени</li>
+      <li><strong>Music21</strong> - алгоритмы музыкальной композиции</li>
+    </ul>
+    
+    <p>Интерактивная 3D модель мозга выше позволяет вам исследовать различные зоны мозга и увидеть, как их активность влияет на генерируемую музыку. Вы можете вращать модель, приближать отдельные участки и наблюдать, как изменяется музыка при активации разных областей.</p>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+
+<script>
+  // Глобальные переменные
+  let scene, camera, renderer, controls;
+  let brainModel = null;
+  let soundWaves = [];
+  let initialCameraPosition = new THREE.Vector3(0, 0, 5);
+  let initialCameraTarget = new THREE.Vector3(0, 0, 0);
+  let rotateEnabled = true;
+  let isInitialized = false;
+
+  // Параметры волн
+  const waveParams = {
+    count: 12,
+    minSpeed: 0.2,
+    maxSpeed: 0.8,
+    minSize: 0.5,
+    maxSize: 4.0,
+    colors: [
+      0xE5BEEC, // фиолетовый
+      0x9A86A4, // мягкий фиолетовый
+      0x917FB3, // пурпурный
+      0x2A2F4F, // темно-синий
+      0xD8BFD8  // лавандовый
+    ],
+    opacity: 0.7
+  };
+
+  // Инициализация приложения
+  function init() {
+    initScene();
+    initControls();
+    setupEventListeners();
+    loadModel();
+  }
+
+  // Инициализация сцены
+  function initScene() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    
+    const container = document.getElementById('brain-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ 
+      antialias: true,
+      alpha: true
+    });
+    renderer.setSize(width, height);
+    container.appendChild(renderer.domElement);
+    
+    // Освещение
+    const light1 = new THREE.DirectionalLight(0xffffff, 1);
+    light1.position.set(1, 1, 1);
+    scene.add(light1);
+    
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
+
+    // Добавляем туман для глубины
+    scene.fog = new THREE.FogExp2(0x000000, 0.002);
+  }
+
+  // Создание звуковых волн
+  function createSoundWaves() {
+  // Удаляем старые волны
+  soundWaves.forEach(wave => scene.remove(wave));
+  soundWaves = [];
+  
+  if (!brainModel) return;
+
+  // Получаем размеры модели мозга
+  const box = new THREE.Box3().setFromObject(brainModel);
+  const brainSize = box.getSize(new THREE.Vector3());
+  const brainCenter = box.getCenter(new THREE.Vector3()).add(brainModel.position);
+
+  // Создаем 8 направлений для волн (по числу основных долей мозга)
+  const directions = [
+    new THREE.Vector3(1, 0, 0),   // право
+    new THREE.Vector3(-1, 0, 0),  // лево
+    new THREE.Vector3(0, 1, 0),   // верх
+    new THREE.Vector3(0, -1, 0),  // низ
+    new THREE.Vector3(0.7, 0.7, 0).normalize(),  // правый верх
+    new THREE.Vector3(-0.7, 0.7, 0).normalize(), // левый верх
+    new THREE.Vector3(0.7, -0.7, 0).normalize(), // правый низ
+    new THREE.Vector3(-0.7, -0.7,  0).normalize() // левый низ
+  ];
+
+  // Создаем волны для каждого направления
+  directions.forEach((dir, i) => {
+    // Создаем геометрию волны (синусоида)
+    const waveLength = 100 + Math.random() * 5;
+    const waveWidth = brainSize.x * 0.3;
+    const geometry = new THREE.BufferGeometry();
+    
+    const vertices = [];
+    const segments = 50;
+    
+    // Создаем синусоидальную волну
+    for (let j = 0; j <= segments; j++) {
+      const x = (j / segments) * waveWidth - waveWidth/2;
+      const y = Math.sin((j / segments) * Math.PI * 4) * 0.2;
+      vertices.push(x, y, 0);
+    }
+    
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    
+    // Создаем линию с градиентом
+    const material = new THREE.LineBasicMaterial({
+      color: 0xE5BEEC,
+      transparent: true,
+      opacity: 0.8,
+      linewidth: 2
+    });
+
+    // В createSoundWaves() после создания материала:
+    const hue = 0.8 + Math.random() * 0.1; // Фиолетовые оттенки
+    material.color.setHSL(hue, 0.7, 0.7);
+    
+    const wave = new THREE.Line(geometry, material);
+    wave.position.copy(brainCenter);
+    
+    // Ориентируем волну в нужном направлении
+    wave.lookAt(dir.clone().add(brainCenter));
+    wave.rotation.z = Math.PI/2; // Поворачиваем на 90 градусов
+    
+    // Параметры анимации волны
+    wave.userData = {
+      speed: 0.5 + Math.random() * 0.3,
+      direction: dir,
+      startTime: 0,
+      length: waveLength,
+      width: waveWidth,
+      amplitude: 0.2,
+      frequency: 4,
+      delay: i * 200
+    };
+    
+    wave.visible = false;
+    scene.add(wave);
+    soundWaves.push(wave);
+  });
+}
+
+  // Анимация волн
+  function animateWaves() {
+  const time = Date.now();
+  
+  soundWaves.forEach(wave => {
+    // Активируем волну после задержки
+    if (!wave.visible && time > wave.userData.delay) {
+      wave.visible = true;
+      wave.userData.startTime = time;
+    }
+    
+    if (wave.visible) {
+      // Движение волны от центра
+      const progress = (time - wave.userData.startTime) / 1000;
+      const distance = progress * wave.userData.speed;
+      
+      // Обновляем позицию
+      wave.position.copy(brainModel.position)
+        .add(wave.userData.direction.clone().multiplyScalar(distance));
+      
+      // Анимация формы волны (пульсация)
+      const pulse = Math.sin(progress * 3) * 0.5 + 0.5;
+      const amplitude = wave.userData.amplitude * pulse;
+      const positions = wave.geometry.attributes.position.array;
+      
+      // Обновляем геометрию волны
+      for (let i = 0; i <= 50; i++) {
+        const x = (i / 50) * wave.userData.width - wave.userData.width/2;
+        const y = Math.sin((i / 50) * Math.PI * wave.userData.frequency) * amplitude;
+        positions[i*3 + 1] = y;
+      }
+      
+      wave.geometry.attributes.position.needsUpdate = true;
+      
+      // Изменение прозрачности
+      wave.material.opacity = 0.8 * (1 - Math.min(1, distance / 10));
+      
+      // Перезапуск волны, когда она уходит далеко
+      if (distance > 3) {
+        resetWave(wave);
+      }
+    }
+  });
+
+}
+
+  // Сброс волны
+  function resetWave(wave) {
+  wave.position.copy(brainModel.position);
+  wave.visible = false;
+  wave.userData.startTime = 0;
+  wave.userData.delay = Math.random() * 1000;
+  wave.userData.speed = 0.5 + Math.random() * 0.3;
+  wave.material.opacity = 0.8;
+  
+  // Новая амплитуда и частота
+  wave.userData.amplitude = 0.015 + Math.random() * 0.1;
+  wave.userData.frequency = 3000 + Math.random() * 2;
+}
+
+  // Инициализация контролов
+  function initControls() {
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.autoRotate = rotateEnabled;
+  }
+
+  // Загрузка модели
+  function loadModel() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    loadingOverlay.style.display = 'flex';
+    
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      'static/models/brain.glb',
+      function (gltf) {
+        brainModel = gltf.scene;
+        scene.add(brainModel);
+        
+        // Центрирование модели
+        const box = new THREE.Box3().setFromObject(brainModel);
+        const center = box.getCenter(new THREE.Vector3());
+        brainModel.position.sub(center);
+        
+        // Создаем волны после загрузки модели
+        createSoundWaves();
+        
+        // Настройка камеры
+        const size = box.getSize(new THREE.Vector3()).length();
+        camera.position.z = size * 1.5;
+        
+        // Сохраняем исходную позицию камеры для сброса
+        initialCameraPosition = camera.position.clone();
+        initialCameraTarget = controls.target.clone();
+        
+        loadingOverlay.style.display = 'none';
+        animate();
+      },
+      function (xhr) {
+        const percentLoaded = Math.round((xhr.loaded / xhr.total) * 100);
+        loadingOverlay.textContent = `Загрузка модели... ${percentLoaded}%`;
+      },
+      function (error) {
+        console.error('Ошибка загрузки модели:', error);
+        loadingOverlay.textContent = 'Ошибка загрузки модели. Пожалуйста, обновите страницу.';
+      }
+    );
+  }
+
+  // Настройка обработчиков событий
+  function setupEventListeners() {
+    // Кнопки управления
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      camera.fov = Math.max(10, camera.fov - 5);
+      camera.updateProjectionMatrix();
+    });
+    
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      camera.fov = Math.min(100, camera.fov + 5);
+      camera.updateProjectionMatrix();
+    });
+    
+    document.getElementById('reset-view').addEventListener('click', () => {
+      if (brainModel) {
+        camera.position.copy(initialCameraPosition);
+        controls.target.copy(initialCameraTarget);
+        camera.lookAt(controls.target);
+        camera.fov = 75;
+        camera.updateProjectionMatrix();
+      }
+    });
+    
+    document.getElementById('rotate-toggle').addEventListener('click', () => {
+      rotateEnabled = !rotateEnabled;
+      controls.autoRotate = rotateEnabled;
+      document.getElementById('rotate-toggle').textContent = 
+        `Вращение: ${rotateEnabled ? 'Вкл' : 'Выкл'}`;
+    });
+    
+    // Полноэкранный режим
+    document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+    
+    // Изменение размера окна
+    window.addEventListener('resize', onWindowResize);
+  }
+
+  // Полноэкранный режим
+  function toggleFullscreen() {
+    const wrapper = document.getElementById('brain-wrapper');
+    
+    if (!document.fullscreenElement) {
+      wrapper.requestFullscreen()
+        .then(() => {
+          document.getElementById('fullscreen-btn').textContent = 'Выйти из полного экрана';
+          onWindowResize();
+        })
+        .catch(err => {
+          console.error('Ошибка полноэкранного режима:', err);
+        });
+    } else {
+      document.exitFullscreen()
+        .then(() => {
+          document.getElementById('fullscreen-btn').textContent = 'Полный экран';
+          onWindowResize();
+        });
+    }
+  }
+
+  // Обработка изменения размера
+  function onWindowResize() {
+    const container = document.getElementById('brain-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  }
+
+  // Анимационный цикл
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    // Анимация волн
+    animateWaves();
+    
+    if (rotateEnabled && controls.autoRotate) {
+      controls.update();
+    }
+    
+    renderer.render(scene, camera);
+  }
+
+  // Запуск приложения
+  document.addEventListener('DOMContentLoaded', init);
+</script>
