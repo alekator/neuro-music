@@ -301,6 +301,7 @@
                         const response = await fetch(`/partials/${page}/`);
                         const html = await response.text();
                         document.getElementById('content-container').innerHTML = html;
+                        //location.reload();
                     } catch (error) {
                         console.error('Ошибка загрузки страницы:', error);
                     }

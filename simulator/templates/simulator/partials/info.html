@@ -183,61 +183,71 @@
 
 <!-- Новый текстовый блок -->
 <div class="app-description">
-    <h1>NeuroMusic Lab: Генерация нейромелодий на основе сигналов мозга</h1>
-    
-    <p>Добро пожаловать в инновационное приложение <span class="highlight">NeuroMusic Lab</span>, которое преобразует электрическую активность вашего мозга в уникальные музыкальные композиции. Наша технология использует последние достижения в области нейронаук и искусственного интеллекта для создания персонализированной музыки, отражающей ваше текущее психическое состояние.</p>
-    
-    <h2>Как это работает?</h2>
-    
-    <p>Приложение анализирует <span class="highlight">EEG-сигналы</span> (электроэнцефалограмму) вашего мозга, выделяя ключевые паттерны активности:</p>
-    
-    <ul>
-      <li><strong>Частотные характеристики:</strong> Альфа, бета, тета и дельта волны определяют ритмическую структуру музыки</li>
-      <li><strong>Амплитуда сигналов:</strong> Влияет на громкость и интенсивность звучания</li>
-      <li><strong>Межполушарная асимметрия:</strong> Определяет баланс между мелодией и гармонией</li>
-      <li><strong>Эмоциональные маркеры:</strong> Специальные алгоритмы распознают эмоциональное состояние</li>
-    </ul>
-    
-    <h2>Научная основа</h2>
-    
-    <p>Наша технология основана на последних исследованиях в области <span class="highlight">нейромузыкологии</span> и использует проверенные научные принципы:</p>
-    
-    <p>Исследования показали, что различные частоты мозговых волн коррелируют с определенными эмоциональными состояниями. Например, повышенная активность альфа-волн (8-12 Гц) ассоциируется с расслабленным состоянием, в то время как бета-волны (12-30 Гц) связаны с активным мышлением и концентрацией.</p>
-    
-    <p>Мы преобразуем эти паттерны в музыкальные параметры:</p>
-    
-    <ul>
-      <li>Частота мозговых волн → Темп и ритм музыки</li>
-      <li>Амплитуда колебаний → Громкость и динамика</li>
-      <li>Соотношение волн → Гармоническая сложность</li>
-      <li>Локализация активности → Выбор инструментов</li>
-    </ul>
-    
-    <h2>Практическое применение</h2>
-    
-    <p>NeuroMusic Lab находит применение в различных областях:</p>
-    
-    <ul>
-      <li><strong>Медитация и релаксация:</strong> Музыка, синхронизированная с вашим мозгом, усиливает эффект расслабления</li>
-      <li><strong>Креативная работа:</strong> Помогает войти в состояние потока</li>
-      <li><strong>Терапевтическое использование:</strong> В нейрореабилитации и терапии психических расстройств</li>
-      <li><strong>Научные исследования:</strong> Изучение связи между мозговой активностью и восприятием музыки</li>
-    </ul>
-    
-    <h2>Технологический стек</h2>
-    
-    <p>Для реализации проекта используются следующие технологии:</p>
-    
-    <ul>
-      <li><strong>Django</strong> - высокоуровневый Python фреймворк для backend</li>
-      <li><strong>Three.js</strong> - визуализация 3D моделей мозга (которую вы видите выше)</li>
-      <li><strong>TensorFlow.js</strong> - анализ и интерпретация EEG сигналов</li>
-      <li><strong>Web Audio API</strong> - генерация и обработка звука в реальном времени</li>
-      <li><strong>Music21</strong> - алгоритмы музыкальной композиции</li>
-    </ul>
-    
-    <p>Интерактивная 3D модель мозга выше позволяет вам исследовать различные зоны мозга и увидеть, как их активность влияет на генерируемую музыку. Вы можете вращать модель, приближать отдельные участки и наблюдать, как изменяется музыка при активации разных областей.</p>
-  </div>
+  <h1>NeuroMusic Lab: Генерация нейромелодий на основе сигналов мозга</h1>
+  
+  <p>Добро пожаловать в инновационное приложение <span class="highlight">NeuroMusic Lab</span>, которое преобразует электрическую активность вашего мозга в уникальные музыкальные композиции. Технология использует достижения в области нейронаук и искусственного интеллекта для создания персонализированной музыки, отражающей ваше текущее психическое состояние и корректирует ее в реальном времени до достижения наилучшего результата.</p>
+  
+  <h2>Как это работает?</h2>
+  
+  <p>Приложение анализирует <span class="highlight">EEG-сигналы</span> (электроэнцефалограмму) вашего мозга, выделяя ключевые паттерны активности:</p>
+  
+  <ul>
+    <li><strong>Частотные характеристики:</strong> Альфа, бета, тета и дельта волны определяют ритмическую структуру музыки</li>
+    <li><strong>Амплитуда сигналов:</strong> Влияет на громкость и интенсивность звучания</li>
+    <li><strong>Межполушарная асимметрия:</strong> Определяет баланс между мелодией и гармонией</li>
+    <li><strong>Эмоциональные маркеры:</strong> Специальные алгоритмы распознают эмоциональное состояние</li>
+    <li><strong>Искусственный интеллект:</strong> Нейросеть строит паттерн вашего настроения (EEG сигналов) и на основе него генерирует мелодию постоянно корректируя ее по ходу использования</li>
+  </ul>
+  
+  <h2>Научная основа</h2>
+  
+  <p>Наша технология основана на последних исследованиях в области <span class="highlight">нейро исследований</span> и использует проверенные научные принципы:</p>
+  
+  <p>Исследования показали, что различные частоты мозговых волн коррелируют с определенными эмоциональными состояниями. Например, повышенная активность альфа-волн (8-12 Гц) ассоциируется с расслабленным состоянием, в то время как бета-волны (12-30 Гц) связаны с активным мышлением и концентрацией.</p>
+  
+  <p>Мы преобразуем эти паттерны в музыкальные параметры:</p>
+  
+  <ul>
+    <li>Частота мозговых волн → Темп и ритм музыки</li>
+    <li>Амплитуда колебаний → Громкость и динамика</li>
+    <li>Соотношение волн → Гармоническая сложность</li>
+    <li>Локализация активности → Выбор инструментов</li>
+  </ul>
+  
+  <p>Как и многие другие весовые характеристики</p>
+
+  <h2>Практическое применение</h2>
+  
+  <p>NeuroMusic Lab может быть использована в различных областях:</p>
+  
+  <ul>
+    <li><strong>Медитация и релаксация:</strong> Музыка, синхронизированная с вашим мозгом, усиливает эффект расслабления</li>
+    <li><strong>Креативная работа:</strong> Помогает войти в состояние потока</li>
+    <li><strong>Продуктивная тренировка:</strong> Высокие частоты для высоких достижений</li>
+    <li><strong>Терапевтическое использование:</strong> В нейрореабилитации и терапии психических расстройств</li>
+    <li><strong>Научные исследования:</strong> Изучение связи между мозговой активностью и восприятием музыки</li>
+  </ul>
+  
+  <h2>Технологический стек</h2>
+  
+  <p>Для реализации проекта используются следующие технологии:</p>
+  
+  <ul>
+    <li><strong>Python</strong> - основной язык реализации проекта</li>
+    <li><strong>Django</strong> - фреймворк для разработки веб приложения</li>
+    <li><strong>Three.js</strong> - визуализация 3D моделей мозга (которую вы видите выше)</li>
+    <li><strong>PyTorch</strong> - фреймворк машинного обучения для генерации мелодии</li>
+    <li><strong>TensorFlow.js</strong> - анализ и интерпретация EEG сигналов</li>
+    <li><strong>Web Audio API</strong> - генерация и обработка звука в реальном времени</li>
+    <li><strong>Music21</strong> - алгоритмы музыкальной композиции</li>
+    <li><strong>FluidSynth</strong> - программный синтезатор в реальном времени, основанный на спецификациях SoundFont 2</li>
+    <li><strong>Blender 3D</strong> - создание трёхмерной графики и анимации</li>
+    <li><strong>Pytest</strong> - тестирование всех аспектов приложения</li>
+    <li><strong>Music21</strong> - алгоритмы музыкальной композиции</li>
+  </ul>
+  
+  <p>Интерактивная 3D модель мозга выше позволяет вам исследовать возникающие в реальном времени EEG сигналы вашего мозга, как их активность влияет на генерируемую музыку. Вы можете вращать модель, приближать отдельные участки и наблюдать, как изменяется музыка при активации разных областей.</p>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
@@ -253,22 +263,24 @@
   let rotateEnabled = true;
   let isInitialized = false;
 
-  // Параметры волн
-  const waveParams = {
-    count: 12,
-    minSpeed: 0.2,
-    maxSpeed: 0.8,
-    minSize: 0.5,
-    maxSize: 4.0,
-    colors: [
-      0xE5BEEC, // фиолетовый
-      0x9A86A4, // мягкий фиолетовый
-      0x917FB3, // пурпурный
-      0x2A2F4F, // темно-синий
-      0xD8BFD8  // лавандовый
-    ],
-    opacity: 0.7
-  };
+// Обновлённые параметры волн
+const waveParams = {
+  count: 100, // Оптимальное количество для производительности
+  colors: [
+    0xE5BEEC, 0x9A86A4, 0x917FB3, 0x2A2F4F, 0xD8BFD8,
+    0xBFA2DB, 0x7F7C82, 0x8F43EE, 0xE0FFFF, 0x00008B, 
+    0xFF00FF, 0xFFFFFF, 0xF0FFFF, 0xB0C4DE, 0x1E90FF
+  ],
+  minSpeed: 0.2,
+  maxSpeed: 0.5,
+  minLength: 1,
+  maxLength: 10,
+  minAmplitude: 0.2,
+  maxAmplitude: 1.5,
+  minFrequency: 0.5,
+  maxFrequency: 4,
+  fadeSpeed: 0.5 + Math.random() // Случайная скорость затухания
+};
 
   // Инициализация приложения
   function init() {
@@ -307,145 +319,226 @@
     scene.fog = new THREE.FogExp2(0x000000, 0.002);
   }
 
-  // Создание звуковых волн
-  function createSoundWaves() {
-  // Удаляем старые волны
+  // Улучшенная функция создания волн
+function createSoundWaves() {
   soundWaves.forEach(wave => scene.remove(wave));
   soundWaves = [];
   
   if (!brainModel) return;
 
-  // Получаем размеры модели мозга
-  const box = new THREE.Box3().setFromObject(brainModel);
-  const brainSize = box.getSize(new THREE.Vector3());
-  const brainCenter = box.getCenter(new THREE.Vector3()).add(brainModel.position);
+  for (let i = 0; i < waveParams.count; i++) {
+    const length = waveParams.minLength + Math.random() * 
+                 (waveParams.maxLength - waveParams.minLength);
+    const amplitude = waveParams.minAmplitude + Math.random() * 
+                    (waveParams.maxAmplitude - waveParams.minAmplitude);
+    const frequency = waveParams.minFrequency + Math.random() * 
+                    (waveParams.maxFrequency - waveParams.minFrequency);
+    const speed = waveParams.minSpeed + Math.random() * 
+                (waveParams.maxSpeed - waveParams.minSpeed);
+    const color = waveParams.colors[Math.floor(Math.random() * waveParams.colors.length)];
+    const fadeSpeed = 0.1 + Math.random() * 0.7; // Случайная скорость затухания
 
-  // Создаем 8 направлений для волн (по числу основных долей мозга)
-  const directions = [
-    new THREE.Vector3(1, 0, 0),   // право
-    new THREE.Vector3(-1, 0, 0),  // лево
-    new THREE.Vector3(0, 1, 0),   // верх
-    new THREE.Vector3(0, -1, 0),  // низ
-    new THREE.Vector3(0.7, 0.7, 0).normalize(),  // правый верх
-    new THREE.Vector3(-0.7, 0.7, 0).normalize(), // левый верх
-    new THREE.Vector3(0.7, -0.7, 0).normalize(), // правый низ
-    new THREE.Vector3(-0.7, -0.7,  0).normalize() // левый низ
-  ];
-
-  // Создаем волны для каждого направления
-  directions.forEach((dir, i) => {
-    // Создаем геометрию волны (синусоида)
-    const waveLength = 100 + Math.random() * 5;
-    const waveWidth = brainSize.x * 0.3;
+    const segments = 24;
     const geometry = new THREE.BufferGeometry();
-    
     const vertices = [];
-    const segments = 50;
     
-    // Создаем синусоидальную волну
     for (let j = 0; j <= segments; j++) {
-      const x = (j / segments) * waveWidth - waveWidth/2;
-      const y = Math.sin((j / segments) * Math.PI * 4) * 0.2;
+      const x = (j / segments) * length;
+      const y = Math.sin((j / segments) * Math.PI * frequency) * amplitude;
       vertices.push(x, y, 0);
     }
     
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     
-    // Создаем линию с градиентом
     const material = new THREE.LineBasicMaterial({
-      color: 0xE5BEEC,
+      color: color,
       transparent: true,
-      opacity: 0.8,
-      linewidth: 2
+      opacity: 0.9,
+      linewidth: 1.5
     });
-
-    // В createSoundWaves() после создания материала:
-    const hue = 0.8 + Math.random() * 0.1; // Фиолетовые оттенки
-    material.color.setHSL(hue, 0.7, 0.7);
     
     const wave = new THREE.Line(geometry, material);
-    wave.position.copy(brainCenter);
+    const startPoint = getRandomPointOnBrainSurface();
+    wave.position.copy(startPoint);
     
-    // Ориентируем волну в нужном направлении
-    wave.lookAt(dir.clone().add(brainCenter));
-    wave.rotation.z = Math.PI/2; // Поворачиваем на 90 градусов
+    // Улучшенное направление с большей хаотичностью
+    const normalDirection = getSurfaceNormal(startPoint);
+    const randomDeviation = new THREE.Vector3(
+      (Math.random() - 0.5) * 1.5,
+      (Math.random() - 0.5) * 1.5,
+      (Math.random() - 0.5) * 2.9
+    );
     
-    // Параметры анимации волны
+    const direction = normalDirection.clone()
+      .add(randomDeviation)
+      .normalize();
+    
+    wave.lookAt(direction.clone().add(startPoint));
+    wave.rotation.z = Math.PI/2;
+    
     wave.userData = {
-      speed: 0.5 + Math.random() * 0.3,
-      direction: dir,
-      startTime: 0,
-      length: waveLength,
-      width: waveWidth,
-      amplitude: 0.2,
-      frequency: 4,
-      delay: i * 200
+      speed: speed,
+      direction: direction,
+      startPos: startPoint.clone(),
+      length: length,
+      amplitude: amplitude,
+      frequency: frequency,
+      startTime: Date.now() + i * 200,
+      color: color,
+      fadeSpeed: fadeSpeed,
+      maxLife: 2 + Math.random() * 3 // Случайное время жизни
     };
     
-    wave.visible = false;
     scene.add(wave);
     soundWaves.push(wave);
-  });
+  }
 }
 
-  // Анимация волн
-  function animateWaves() {
+// Улучшенная функция получения точек на поверхности
+function getRandomPointOnBrainSurface() {
+  const box = new THREE.Box3().setFromObject(brainModel);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  
+  // Создаем более хаотичное распределение точек
+  const sphericalRand = () => {
+    const v = new THREE.Vector3(
+      (Math.random() - 0.5) * 2,
+      (Math.random() - 0.5) * 2,
+      (Math.random() - 0.5) * 2
+    ).normalize();
+    
+    // Добавляем дополнительную случайность
+    v.x += (Math.random() - 0.5) * 0.3;
+    v.y += (Math.random() - 0.5) * 0.3;
+    v.z += (Math.random() - 0.5) * 0.3;
+    return v.normalize();
+  };
+  
+  // Корректировки положения (подставьте свои значения)
+  const adjustX = 0.01; // Право/лево
+  const adjustY = -0.01; // Выше/ниже
+  const adjustZ = 0.001; // Ближе/дальше
+  
+  const radius = Math.max(size.x, size.y, size.z) * 0.42;
+  const direction = sphericalRand();
+  
+  return new THREE.Vector3(
+    center.x + direction.x * radius + adjustX,
+    center.y + direction.y * radius + adjustY,
+    center.z + direction.z * radius + adjustZ
+  );
+}
+
+function getSurfaceNormal(point) {
+  // Скорректированный центр (должен совпадать с getRandomPointOnBrainSurface)
+  const box = new THREE.Box3().setFromObject(brainModel);
+  const center = box.getCenter(new THREE.Vector3());
+  const adjustedCenter = new THREE.Vector3(
+    center.x + 0.01,
+    center.y - 0.01,
+    center.z + 0.001
+  );
+  
+  return point.clone().sub(adjustedCenter).normalize();
+}
+
+// Улучшенная функция анимации
+function animateWaves() {
   const time = Date.now();
   
   soundWaves.forEach(wave => {
-    // Активируем волну после задержки
-    if (!wave.visible && time > wave.userData.delay) {
-      wave.visible = true;
-      wave.userData.startTime = time;
+    if (time < wave.userData.startTime) return;
+    
+    const aliveTime = (time - wave.userData.startTime) / 1000;
+    const lifeProgress = aliveTime / wave.userData.maxLife;
+    
+    // Плавное движение с замедлением
+    const distance = wave.userData.speed * aliveTime * 
+                    Math.max(0, 1 - lifeProgress * 0.3);
+    
+    wave.position.copy(wave.userData.startPos)
+      .add(wave.userData.direction.clone().multiplyScalar(distance));
+    
+    // Динамическое изменение формы
+    const positions = wave.geometry.attributes.position.array;
+    const segments = (positions.length / 3) - 1;
+    const currentAmplitude = wave.userData.amplitude * 
+                           (1 - lifeProgress * wave.userData.fadeSpeed);
+    
+    for (let j = 0; j <= segments; j++) {
+      const x = (j / segments) * wave.userData.length;
+      const y = Math.sin((j / segments) * Math.PI * wave.userData.frequency + 
+               aliveTime * 1.5) * currentAmplitude;
+      positions[j*3 + 1] = y;
     }
     
-    if (wave.visible) {
-      // Движение волны от центра
-      const progress = (time - wave.userData.startTime) / 1000;
-      const distance = progress * wave.userData.speed;
-      
-      // Обновляем позицию
-      wave.position.copy(brainModel.position)
-        .add(wave.userData.direction.clone().multiplyScalar(distance));
-      
-      // Анимация формы волны (пульсация)
-      const pulse = Math.sin(progress * 3) * 0.5 + 0.5;
-      const amplitude = wave.userData.amplitude * pulse;
-      const positions = wave.geometry.attributes.position.array;
-      
-      // Обновляем геометрию волны
-      for (let i = 0; i <= 50; i++) {
-        const x = (i / 50) * wave.userData.width - wave.userData.width/2;
-        const y = Math.sin((i / 50) * Math.PI * wave.userData.frequency) * amplitude;
-        positions[i*3 + 1] = y;
-      }
-      
-      wave.geometry.attributes.position.needsUpdate = true;
-      
-      // Изменение прозрачности
-      wave.material.opacity = 0.8 * (1 - Math.min(1, distance / 10));
-      
-      // Перезапуск волны, когда она уходит далеко
-      if (distance > 3) {
-        resetWave(wave);
-      }
+    wave.geometry.attributes.position.needsUpdate = true;
+    
+    // Нелинейное затухание
+    wave.material.opacity = 0.9 * Math.pow(1 - lifeProgress, 1.8);
+    
+    // Перезапуск волны
+    if (lifeProgress > 0.35 || wave.material.opacity < 0.05) {
+      resetWave(wave);
     }
   });
-
 }
 
-  // Сброс волны
-  function resetWave(wave) {
-  wave.position.copy(brainModel.position);
-  wave.visible = false;
-  wave.userData.startTime = 0;
-  wave.userData.delay = Math.random() * 1000;
-  wave.userData.speed = 0.5 + Math.random() * 0.3;
-  wave.material.opacity = 0.8;
+// Улучшенный сброс волны
+function resetWave(wave) {
+  const startPoint = getRandomPointOnBrainSurface();
+  wave.position.copy(startPoint);
+  wave.userData.startPos.copy(startPoint);
   
-  // Новая амплитуда и частота
-  wave.userData.amplitude = 0.015 + Math.random() * 0.1;
-  wave.userData.frequency = 3000 + Math.random() * 2;
+  // Новое направление с большей хаотичностью
+  const normalDirection = getSurfaceNormal(startPoint);
+  const randomDeviation = new THREE.Vector3(
+    (Math.random() - 0.5) * 1.6,
+    (Math.random() - 0.5) * 1.6,
+    (Math.random() - 0.5) * 2.6
+  );
+  
+  wave.userData.direction = normalDirection.clone()
+    .add(randomDeviation)
+    .normalize();
+  
+  wave.lookAt(wave.userData.direction.clone().add(startPoint));
+  wave.rotation.z = Math.PI/2;
+  
+  // Обновляем параметры с большим разбросом
+  wave.userData.startTime = Date.now() + Math.random() * 500;
+  wave.userData.speed = waveParams.minSpeed + Math.random() * 
+                       (waveParams.maxSpeed - waveParams.minSpeed);
+  wave.userData.length = waveParams.minLength + Math.random() * 
+                        (waveParams.maxLength - waveParams.minLength);
+  wave.userData.amplitude = waveParams.minAmplitude + Math.random() * 
+                           (waveParams.maxAmplitude - waveParams.minAmplitude);
+  wave.userData.frequency = waveParams.minFrequency + Math.random() * 
+                          (waveParams.maxFrequency - waveParams.minFrequency);
+  wave.userData.fadeSpeed = 0.1 + Math.random() * 0.7;
+  wave.userData.maxLife = 2 + Math.random() * 3;
+  
+  // Обновляем геометрию
+  const segments = 24;
+  const geometry = new THREE.BufferGeometry();
+  const vertices = [];
+  
+  for (let j = 0; j <= segments; j++) {
+    const x = (j / segments) * wave.userData.length;
+    const y = Math.sin((j / segments) * Math.PI * wave.userData.frequency) * 
+             wave.userData.amplitude;
+    vertices.push(x, y, 0);
+  }
+  
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  wave.geometry = geometry;
+  
+  wave.material.color.setHex(
+    waveParams.colors[Math.floor(Math.random() * waveParams.colors.length)]
+  );
+  
+  wave.material.opacity = 0.9;
 }
 
   // Инициализация контролов
