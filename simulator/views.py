@@ -184,3 +184,12 @@ def test_media(request):
         return FileResponse(open(test_file, 'rb'))
     except FileNotFoundError:
         return HttpResponse("Test file not found", status=404)
+def partial_view(request, page):
+    print(f"Requested page: {page}")  # Добавьте эту строку
+    templates = {
+        'info': 'simulator/partials/info.html',
+        'generator': 'simulator/partials/generator.html',
+        'analytics': 'simulator/partials/analytics.html',
+        'settings': 'simulator/partials/settings.html',
+    }
+    return render(request, templates.get(page, 'simulator/partials/info.html'))

@@ -284,30 +284,310 @@
         {% include 'simulator/partials/info.html' %}
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Загрузка контента при нажатии на кнопки
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const page = btn.dataset.page;
+    <!-- Добавьте этот скрипт в конец вашего основного HTML файла, перед закрывающим </body> -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    // Глобальные переменные для управления аналитикой
+    let analyticsInitialized = false;
+    let analyticsSocket = null;
+
+    // Функция инициализации аналитики (будет вызываться при загрузке контента)
+    function initAnalytics() {
+        if (analyticsInitialized) return;
+        analyticsInitialized = true;
+        
+        console.log("Initializing advanced analytics...");
+
+        // 1. Улучшенный генератор EEG сигналов
+        function generateEEGSignal(emotion, duration = 3) {
+            const sampleRate = 256;
+            const points = duration * sampleRate;
+            let x = new Array(points);
+            let y = new Array(points);
+            
+            const params = {
+                relax:    { baseFreq: 0.08, volatility: 0.02, amplitude: 0.8 },
+                focus:    { baseFreq: 0.15, volatility: 0.01, amplitude: 1.0 },
+                stress:   { baseFreq: 0.25, volatility: 0.05, amplitude: 1.5 },
+                happy:    { baseFreq: 0.12, volatility: 0.03, amplitude: 0.9 },
+                sad:      { baseFreq: 0.06, volatility: 0.04, amplitude: 0.6 }
+            };
+            
+            const { baseFreq, volatility, amplitude } = params[emotion] || params.relax;
+            
+            for (let i = 0; i < points; i++) {
+                x[i] = i / sampleRate;
+                let value = 0;
+                
+                for (let h = 1; h <= 5; h++) {
+                    value += Math.sin(i * baseFreq * h) * (amplitude / h);
+                }
+                
+                if (Math.random() < volatility) {
+                    value += (Math.random() - 0.5) * amplitude * 2;
+                }
+                
+                value += Math.sin(i * 0.01) * amplitude * 0.3;
+                y[i] = value;
+            }
+            
+            return { x, y };
+        }
+
+        // 2. Генератор музыкальных волн
+        function generateMusicWave(emotion, duration = 3) {
+            const sampleRate = 441;
+            const points = duration * sampleRate;
+            let x = new Array(points);
+            let y = new Array(points);
+            
+            const waveTypes = {
+                relax:    { freq: 0.2,  harmonics: 3, wave: 'sine' },
+                focus:    { freq: 0.3,  harmonics: 4, wave: 'sawtooth' },
+                stress:   { freq: 0.5,  harmonics: 5, wave: 'square' },
+                happy:    { freq: 0.25, harmonics: 4, wave: 'triangle' },
+                sad:      { freq: 0.15, harmonics: 2, wave: 'sine' }
+            };
+            
+            const { freq, harmonics, wave } = waveTypes[emotion] || waveTypes.relax;
+            
+            for (let i = 0; i < points; i++) {
+                x[i] = i / sampleRate;
+                let value = 0;
+                
+                switch(wave) {
+                    case 'sine':
+                        for (let h = 1; h <= harmonics; h++) {
+                            value += Math.sin(i * freq * h) * (1 / h);
+                        }
+                        break;
+                        
+                    case 'sawtooth':
+                        for (let h = 1; h <= harmonics; h++) {
+                            value += (Math.sin(i * freq * h) / h * (h % 2 === 0 ? -1 : 1));
+                        }
+                        break;
+                        
+                    case 'square':
+                        for (let h = 1; h <= harmonics; h += 2) {
+                            value += Math.sin(i * freq * h) / h;
+                        }
+                        break;
+                        
+                    case 'triangle':
+                        for (let h = 1; h <= harmonics; h += 2) {
+                            value += (Math.sin(i * freq * h) / (h * h) * (h % 4 === 1 ? 1 : -1));
+                        }
+                        break;
+                }
+                
+                y[i] = value * 0.8;
+            }
+            
+            return { x, y };
+        }
+
+        // 3. Обновление графиков
+        function updatePlots(emotion) {
+            if (!document.getElementById('eeg-plot-content') || 
+                !document.getElementById('music-plot-content')) {
+                console.error("Plot containers not found!");
+                return;
+            }
+
+            const eegData = generateEEGSignal(emotion);
+            const musicData = generateMusicWave(emotion);
+            
+            const eegTrace = {
+                y: eegData.y,
+                x: eegData.x,
+                type: 'line',
+                line: { color: '#E5BEEC', width: 1.5 },
+                name: 'EEG Signal'
+            };
+            
+            const musicTrace = {
+                y: musicData.y,
+                x: musicData.x,
+                type: 'line',
+                line: { color: '#9b59b6', width: 2 },
+                name: 'Music Wave'
+            };
+            
+            const layout = {
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 0, b: 40, l: 5, r: 20 },
+                xaxis: { 
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    titlefont: { color: '#ffffff' },
+                    tickfont: { color: '#ffffff' }
+                },
+                yaxis: { 
+                    title: 'Amplitude',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    titlefont: { color: '#ffffff' },
+                    tickfont: { color: '#ffffff' }
+                },
+                showlegend: false
+            };
+            
+            Plotly.react('eeg-plot-content', [eegTrace], layout);
+            Plotly.react('music-plot-content', [musicTrace], layout);
+            
+            // Обновление объяснения
+            const explanations = {
+                relax: `
+                    <p><strong>Состояние релаксации (Альфа-ритмы 8-13 Гц)</strong></p>
+                    <p>Регулярные синусоидальные волны средней амплитуды отражают спокойное, расслабленное состояние сознания. 
+                    Альфа-ритмы доминируют при закрытых глазах и отсутствии концентрации. 
+                    Музыкальный паттерн представляет плавные гармонические колебания, имитирующие успокаивающие природные звуки.</p>
+                `,
+                focus: `
+                    <p><strong>Состояние концентрации (Бета-ритмы 13-30 Гц)</strong></p>
+                    <p>Высокочастотные низкоамплитудные волны характерны для активной умственной деятельности. 
+                    Бета-активность усиливается при решении задач и фокусировке внимания. 
+                    Музыкальный сигнал имеет четкий ритмический рисунок с умеренной вариативностью, поддерживающий рабочую продуктивность.</p>
+                `,
+                stress: `
+                    <p><strong>Стрессовое состояние (Бета/Гамма-ритмы)</strong></p>
+                    <p>Высокоамплитудные нерегулярные паттерны с резкими всплесками отражают перевозбуждение нервной системы. 
+                    Гамма-волны (30+ Гц) связаны с тревогой и эмоциональным напряжением. 
+                    Музыкальная волна содержит диссонирующие элементы и нерегулярные ритмические структуры, соответствующие состоянию дискомфорта.</p>
+                `,
+                happy: `
+                    <p><strong>Радостное состояние (Смесь Альфа/Бета-ритмов)</strong></p>
+                    <p>Сбалансированная активность альфа- и бета-диапазонов отражает позитивное эмоциональное состояние. 
+                    Характерны синхронизированные колебания средней амплитуды. 
+                    Музыкальный паттерн отличается ярко выраженной мелодичностью, мажорными гармониями и танцевальным ритмом.</p>
+                `,
+                sad: `
+                    <p><strong>Подавленное состояние (Тета-ритмы 4-7 Гц)</strong></p>
+                    <p>Медленные волны с пониженной альфа-активностью характерны для состояний грусти и усталости. 
+                    Тета-ритмы доминируют в фазе легкого сна и при глубокой меланхолии. 
+                    Музыкальный сигнал содержит протяжные нисходящие мелодические линии с минорной гармонизацией.</p>
+                `
+            };
+            
+            const explanationEl = document.getElementById('explanation-content');
+            if (explanationEl) {
+                explanationEl.innerHTML = explanations[emotion] || 
+                    `<p>Select an emotion to see EEG analysis.</p>`;
+            }
+        }
+
+        // 4. Инициализация WebSocket
+        function initWebSocket() {
+            if (analyticsSocket) return;
+            
+            analyticsSocket = new WebSocket(`ws://${window.location.host}/ws/analytics/`);
+            
+            analyticsSocket.onopen = function() {
+                console.log("Analytics WebSocket connected");
+                updatePlots('relax');
+            };
+            
+            analyticsSocket.onerror = function(error) {
+                console.error("WebSocket error:", error);
+            };
+            
+            analyticsSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log("WebSocket message:", data);
+            };
+        }
+
+        // 5. Обработчики кнопок
+        function setupButtons() {
+            const buttons = document.querySelectorAll('.emotion-btn');
+            if (buttons.length === 0) {
+                console.error("No emotion buttons found!");
+                return;
+            }
+            
+            buttons.forEach(btn => {
+                // Удаляем старые обработчики, если есть
+                btn.replaceWith(btn.cloneNode(true));
+                const newBtn = document.querySelector(`.emotion-btn[data-emotion="${btn.dataset.emotion}"]`);
+                
+                // Анимации
+                newBtn.onmouseenter = () => {
+                    newBtn.style.transform = 'translateY(-4px)';
+                    newBtn.style.boxShadow = '0 8px 20px rgba(142, 68, 173, 0.5)';
+                    newBtn.style.background = 'linear-gradient(135deg, #9b59b6, #8e44ad)';
+                };
+                
+                newBtn.onmouseleave = () => {
+                    newBtn.style.transform = '';
+                    newBtn.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                    newBtn.style.background = 'linear-gradient(135deg, #8e44ad, #9b59b6)';
+                };
+                
+                newBtn.onmousedown = () => {
+                    newBtn.style.transform = 'translateY(2px)';
+                    newBtn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+                };
+                
+                newBtn.onmouseup = () => {
+                    newBtn.style.transform = 'translateY(-4px)';
+                    newBtn.style.boxShadow = '0 8px 20px rgba(142, 68, 173, 0.5)';
+                };
+                
+                // Основное действие
+                newBtn.onclick = () => {
+                    const emotion = newBtn.dataset.emotion;
                     
-                    // Убираем активный класс у всех кнопок
-                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                    // Добавляем активный класс текущей кнопке
-                    btn.classList.add('active');
-                    
-                    // Загружаем соответствующий HTML-файл
-                    try {
-                        const response = await fetch(`/partials/${page}/`);
-                        const html = await response.text();
-                        document.getElementById('content-container').innerHTML = html;
-                        //location.reload();
-                    } catch (error) {
-                        console.error('Ошибка загрузки страницы:', error);
+                    if (analyticsSocket) {
+                        analyticsSocket.send(JSON.stringify({ emotion }));
                     }
-                });
+                    
+                    updatePlots(emotion);
+                    
+                    newBtn.style.background = 'linear-gradient(135deg, #7d3c98, #8e44ad)';
+                    setTimeout(() => {
+                        newBtn.style.background = 'linear-gradient(135deg, #8e44ad, #9b59b6)';
+                    }, 200);
+                };
             });
+        }
+
+        // Инициализируем все компоненты
+        initWebSocket();
+        setupButtons();
+        updatePlots('relax');
+    }
+
+    // Модифицируем обработчик загрузки контента
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const page = btn.dataset.page;
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            try {
+                const response = await fetch(`/partials/${page}/`);
+                const html = await response.text();
+                document.getElementById('content-container').innerHTML = html;
+                
+                // Если загрузили аналитику - инициализируем
+                if (page === 'analytics') {
+                    // Даем время на рендеринг DOM
+                    setTimeout(initAnalytics, 50);
+                } else {
+                    // Закрываем соединение при переходе на другие страницы
+                    if (analyticsSocket) {
+                        analyticsSocket.close();
+                        analyticsSocket = null;
+                    }
+                    analyticsInitialized = false;
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки страницы:', error);
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>

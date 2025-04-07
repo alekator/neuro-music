@@ -1,0 +1,108 @@
+<!-- templates/simulator/partials/analytics.html -->
+<div class="analytics-container" style="display: flex; flex-direction: column; height: 80vh; max-height: 800px;">
+    <!-- Верхняя часть с графиками -->
+    <div style="display: flex; height: 60%; min-height: 300px;">
+        <!-- Левая панель - EEG -->
+        <div id="eeg-plot" style="flex: 1; border: 1px solid #ddd; padding: 10px; margin: 5px; overflow: hidden; background: #2A2F4F;">
+            <h3 style="color: #ffffff; margin-top: 0;">Brain EEG Signals</h3>
+            <div id="eeg-plot-content" style="height: calc(100% - 40px);"></div>
+        </div>
+        
+        <!-- Правая панель - Music -->
+        <div id="music-plot" style="flex: 1; border: 1px solid #ddd; padding: 10px; margin: 5px; overflow: hidden; background: #2A2F4F;">
+            <h3 style="color: #ffffff; margin-top: 0;">Music Generation</h3>
+            <div id="music-plot-content" style="height: calc(100% - 40px);"></div>
+        </div>
+    </div>
+    
+    <!-- Центральная часть с кнопками -->
+    <div class="emotion-controls" style="display: flex; justify-content: center; gap: 15px; margin: 20px 0;">
+        <button class="emotion-btn" data-emotion="relax" style="
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #9a4ea1, #8d4cc2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        ">Relax</button>
+        
+        <button class="emotion-btn" data-emotion="focus" style="
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        ">Focus</button>
+        
+        <button class="emotion-btn" data-emotion="stress" style="
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        ">Stress</button>
+        
+        <button class="emotion-btn" data-emotion="happy" style="
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        ">Happy</button>
+        
+        <button class="emotion-btn" data-emotion="sad" style="
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        ">Sad</button>
+    </div>
+    
+    <!-- Нижняя панель - Объяснение -->
+    <div id="explanation" style="flex: 1; border-top: 2px solid #E5BEEC; padding: 15px; background: #FDE2F3; overflow-y: auto; min-height: 100px;">
+        <h3 style="color: #2A2F4F; margin-top: 0;">Как это работает ?</h3>
+        <div id="explanation-content" style="color: #2A2F4F; line-height: 1.6;">
+            Выберите эмоцию, чтобы увидеть соответствующий паттерн ЭЭГ и сгенерированный музыкальный сигнал.
+        </div>
+    </div>
+</div>
