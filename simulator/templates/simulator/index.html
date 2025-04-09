@@ -125,6 +125,33 @@
             transform: translateX(10px);
             box-shadow: 0 0 20px rgba(229, 190, 236, 0.5);
         }
+
+
+        .auth-btn {
+            margin-top: auto !important; /* Прижимаем к низу */
+            justify-content: center !important;
+            width: calc(100% - 12px) !important; /* Учитываем padding */
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: flex !important;
+        }
+
+        /* Анимации для сохранения оригинального поведения */
+        .auth-btn:hover {
+            transform: translateX(10px) !important;
+            background: linear-gradient(90deg, 
+                        rgba(145,127,179,0.3) 0%, 
+                        rgba(42,47,79,0.5) 50%, 
+                        rgba(145,127,179,0.3) 100%) !important;
+        }
+
+        .auth-btn.active {
+            transform: translateX(10px) !important;
+            background: linear-gradient(90deg, 
+                        var(--secondary) 0%, 
+                        var(--primary) 50%, 
+                        var(--secondary) 100%) !important;
+        }
     
         /* Остальные стили */
         .main-content {
@@ -275,9 +302,28 @@
             <button class="nav-btn" data-page="info">ℹ️ Информация</button>
             <button class="nav-btn" data-page="generator">🎵 Генератор</button>
             <button class="nav-btn" data-page="analytics">📊 Аналитика</button>
-            <button class="nav-btn" data-page="settings">⚙️ Настройки</button>
+            <button class="nav-btn auth-btn" data-page="auth" 
+                style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 12px); text-align: center;">
+    🔐          Вход/Регистрация
+            </button>
         </nav>
+        
     </aside>
+
+<!-- Модальное окно авторизации -->
+<div id="auth-modal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+        <h3 style="color: var(--text); text-align: center; margin-bottom: 20px;">Вход в систему</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <input type="text" placeholder="Email" style="padding: 12px; border-radius: 8px; border: 1px solid var(--secondary);">
+            <input type="password" placeholder="Пароль" style="padding: 12px; border-radius: 8px; border: 1px solid var(--secondary);">
+            
+            <button class="nav-btn" style="width: 100%; justify-content: center;">Войти</button>
+            <button class="nav-btn" style="width: 100%; justify-content: center; background: rgba(42,47,79,0.3);">Регистрация</button>
+        </div>
+    </div>
+</div>
 
     <!-- Основной контент -->
     <main class="main-content" id="content-container">
@@ -588,6 +634,20 @@
             }
         });
     });
+
+    // Обработчик для кнопки авторизации
+    document.querySelector('.auth-btn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('auth-modal').style.display = 'block';
+    });
+    
+    // Закрытие модального окна при клике вне его
+    window.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('auth-modal')) {
+            document.getElementById('auth-modal').style.display = 'none';
+        }
+    });
+    
 </script>
 </body>
 </html>
