@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="simulator/templates/simulator/partials/Brain.gif" width="960" alt="NeuroMusic Lab — real-time EEG-driven system" />
-</p>
-
 # NeuroMusic Lab — Real-Time EEG-Driven Music Generation System
 
 **NeuroMusic Lab** is a backend-centric, real-time system that simulates EEG signals, derives emotional states, and transforms continuous signal streams into adaptive music.
