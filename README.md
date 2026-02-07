@@ -39,6 +39,42 @@ The same architectural approach can be applied to:
 
 ---
 
+## Technology Stack
+
+### Backend & Core
+- **Python** — core application logic
+- **Django** — backend framework and request orchestration
+- **Django Channels** — WebSocket-based real-time communication
+- **ASGI** — asynchronous server interface
+
+### Real-Time & Streaming
+- **WebSockets** — live signal and music streaming
+- **Event-driven architecture** — continuous state updates
+
+### Signal Processing & Data
+- **NumPy** — numerical computations and signal processing
+- **SciPy** — frequency analysis and signal transformations
+- **Custom EEG simulation** — deterministic signal generation
+
+### Music Generation
+- **music21** — algorithmic music composition
+- **MIDI** — intermediate musical representation
+- **FluidSynth** (optional) — real-time audio synthesis via SoundFont
+
+### Visualization & UI
+- **Plotly** — real-time analytical charts
+- **Three.js** — interactive 3D brain visualization
+- **HTML / CSS / JavaScript** — dashboard UI
+
+### Infrastructure & Tooling
+- **Web Audio API** — client-side audio processing
+- **PyTorch** — experimental model integration (optional)
+- **TensorFlow.js** — client-side signal interpretation (optional)
+- **Blender** — 3D model creation and animation
+- **Pytest** — automated testing
+
+---
+
 ## High-Level Architecture
 
 ```mermaid
